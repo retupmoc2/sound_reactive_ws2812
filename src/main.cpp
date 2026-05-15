@@ -9,24 +9,8 @@ SoundLevelMeter soundMeter;
 
 void showVolumeBar(float level)
 {
-    static float displayedLitCount = 0.0f;
-
-    const float targetLitCount = constrain(level, 0.0f, 1.0f) * LED_COUNT;
-
-    const float attack = 0.35f;   // rise speed
-    const float release = 0.08f;  // fall speed
-
-    if (targetLitCount > displayedLitCount)
-    {
-        displayedLitCount += (targetLitCount - displayedLitCount) * attack;
-    }
-    else
-    {
-        displayedLitCount += (targetLitCount - displayedLitCount) * release;
-    }
-
     const uint16_t litCount = min<uint16_t>(
-        static_cast<uint16_t>(floorf(displayedLitCount)),
+        static_cast<uint16_t>(roundf(level * LED_COUNT)),
         LED_COUNT);
 
     for (uint16_t i = 0; i < LED_COUNT; ++i)
@@ -99,38 +83,18 @@ void setup()
 
 void loop()
 {
-    // fill_solid(leds, LED_COUNT, CRGB::Black);
-
-    // for (uint16_t i = 0; i < LED_COUNT; ++i)
-    // {
-    //     if ((i * 3) < LED_COUNT)
-    //     {
-    //         leds[i] = CRGB::Green;
-    //     }
-    //     else if ((i * 3) < (LED_COUNT * 2))
-    //     {
-    //         leds[i] = CRGB::Yellow;
-    //     }
-    //     else
-    //     {
-    //         leds[i] = CRGB::Red;
-    //     }
-    // }
-
-    // FastLED.show();
-    // delay(1000);
-
-    // showVolumeBar(1.0f);
-    // delay(100);
-
     uint16_t peakToPeak = 0;
     float noiseFloor = 0.0f;
     float signalMax = 0.0f;
 
-    const float normalizedLevel = soundMeter.readNormalizedLevel(peakToPeak, noiseFloor, signalMax);
-    //showVolumeBar(1.0f);
+    const float normalizedLevel =
+        soundMeter.readNormalizedLevel(peakToPeak, noiseFloor, signalMax);
+
+    static uint32_t lastLedUpdateMs = 0;
+    const uint32_t now = millis();
 
     showVolumeBar(normalizedLevel);
-    printDebug(peakToPeak, noiseFloor, signalMax, normalizedLevel);
+
+    //delayMicroseconds(LED_FRAME_GAP_SPACE);  // Without this, the LED updates can cause interference in the ADC readings, leading to inaccurate sound level measurements.
     delay(1);
 }
