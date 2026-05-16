@@ -1,7 +1,7 @@
 # Sound-Reactive WS2812 Meter
 This is a PlatformIO / VS Code project for driving a WS2812/WS2812B LED strip from ambient sound using an ESP32-S3 board and a MAX4466 analog microphone module. Other ESP32 variants should work, and platformio.ini includes a few alternatives.
 
-This is currently a pretty simple project written by ChatGPT and me. I described what I wanted, and it generated great starting code in around 2 minutes total. I took that output, began tweaking it, and it's working pretty well in my limited testing.
+It's a pretty simple project written by ChatGPT and me. I described what I wanted, and it generated great starting code in less than 2 minutes. I took that output, began tweaking it, and it's working pretty well in my limited testing.
 
 The display behaves like a proportional audio level meter:
 
@@ -18,7 +18,7 @@ This version includes automatic gain control (AGC), so it adapts to the room noi
 
 - Waveshare ESP32-S3 Zero / ESP32-S3 N4R2 style board
 - WS2812 / WS2812B LED strip
-- MAX4466 electret microphone amplifier module
+- MAX4466 electret microphone amplifier module like [this](https://www.amazon.com/Electret-Microphone-Amplifier-Adjustable-Breakout/dp/B08N4FNFTR/ref=dp_prsubs_d_sccl_1/147-8424871-1161968?pd_rd_w=1rWdm&content-id=amzn1.sym.3a248209-0a95-45f5-9012-fc980e70d248&pf_rd_p=3a248209-0a95-45f5-9012-fc980e70d248&pf_rd_r=1WK9ASABKYDYR8WSF179&pd_rd_wg=skYRg&pd_rd_r=fec5d035-9bca-4168-9117-071880573137&pd_rd_i=B08N4FNFTR&psc=1)
 - External 5V supply for the LED strip, if powering more than a few LEDs
 - Common ground between the ESP32 board, LED strip supply, and microphone module
 
@@ -28,7 +28,7 @@ Recommended LED strip protection:
 - 1000 uF electrolytic capacitor across LED strip +5V and GND near the strip input
 - A 74AHCT125 or 74HCT245 level shifter if the strip is unreliable from a 3.3V ESP32 data signal
 
-So far I haven't had a need for a level shifter with any of the strips I've used, but your mileage may vary. I have used BTR LEDs almost exclusively.
+I haven't had a need for a level shifter with any of the strips I've ever used, but your mileage may vary. I have used BTR LEDs almost exclusively.
 
 ---
 
@@ -84,13 +84,11 @@ LEDs 5-7   yellow
 LEDs 8-10  red
 ```
 
-The zone logic is intentionally written to work better with short test strips than simple integer division by 3.
-
 ---
 
 ## Automatic gain control
 
-The firmware samples the microphone waveform for a short window and calculates a peak-to-peak value.
+The firmware samples the microphone output for a short window and calculates a peak-to-peak value.
 
 It then tracks two moving values:
 
