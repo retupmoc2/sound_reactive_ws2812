@@ -1,6 +1,7 @@
 # Sound-Reactive WS2812 Meter
+This is a PlatformIO / VS Code project for driving a WS2812/WS2812B LED strip from ambient sound using an ESP32-S3 board and a MAX4466 analog microphone module. Other ESP32 variants should work, and platformio.ini includes a few alternatives.
 
-A PlatformIO / VS Code project for driving a WS2812/WS2812B LED strip from ambient sound using an ESP32-S3 board and a MAX4466 analog microphone module.
+This is currently a pretty simple project written by ChatGPT and me. I described what I wanted, and it generated great starting code in around 2 minutes total. I took that output, began tweaking it, and it's working pretty well in my limited testing.
 
 The display behaves like a proportional audio level meter:
 
@@ -26,6 +27,8 @@ Recommended LED strip protection:
 - 330–470 ohm resistor in series with the WS2812 data line
 - 1000 uF electrolytic capacitor across LED strip +5V and GND near the strip input
 - A 74AHCT125 or 74HCT245 level shifter if the strip is unreliable from a 3.3V ESP32 data signal
+
+So far I haven't had a need for a level shifter with any of the strips I've used, but your mileage may vary. I have used BTR LEDs almost exclusively.
 
 ---
 
@@ -63,17 +66,17 @@ The color zones are based on LED position:
 
 The number of lit LEDs is based on the current normalized sound level.
 
-For example, with 60 LEDs and an 80% sound level:
+For example, with 60 LEDs and if the ambient sound level reaches a calculated value of 80%:
 
 ```text
-48 LEDs lit total
+48 LEDs lit total (80% * 60)
 20 green
 20 yellow
 8 red
 12 off
 ```
 
-For a 10 LED test strip, full scale should display approximately:
+For a 10 LED test strip, full scale (100% sound level) should display approximately:
 
 ```text
 LEDs 1-4   green
@@ -108,11 +111,9 @@ The AGC maximum rises quickly when a louder sound is detected, then falls slowly
 
 ## Timing note
 
-The main loop currently includes a short `delay(1)` after each LED update.
+The main loop currently includes a short `delay(1)` after each LED update. Without it, the LEDs are much less stable resulting in flicker and incorrect colors due to the speed at which the loop() function runs. 
 
-That small delay is intentional. It gives the ESP32 runtime a chance to yield and helps avoid unstable-looking LED updates on the current hardware setup.
-
-If you experiment with replacing it with `delayMicroseconds(...)`, treat that value as an LED/display timing gap, not a microphone tuning value. Different LED strips, wiring, level shifting, and power layouts may behave differently.
+You might have to tweak the delay ms for your setup since arbitrary timing adjustments can be hardware-dependent. 
 
 ---
 
@@ -200,8 +201,6 @@ upload_port = COM7
 
 ## Project notes
 
-The project includes `boards/esp32-s3-n4r2.json`, but the current default environment uses PlatformIO's `esp32-s3-devkitc-1` board definition with Waveshare-specific flash/PSRAM settings. The custom board file is therefore not used by the default environment unless `platformio.ini` is changed to reference it.
-
 The source code is intentionally small:
 
 ```text
@@ -210,4 +209,3 @@ include/SoundLevelMeter.h    Sound meter class declaration
 src/SoundLevelMeter.cpp      ADC sampling and AGC logic
 src/main.cpp                 FastLED setup, LED bar drawing, main loop
 ```
-
