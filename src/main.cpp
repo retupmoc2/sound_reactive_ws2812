@@ -91,10 +91,8 @@ void loop()
         soundMeter.readNormalizedLevel(peakToPeak, noiseFloor, signalMax);
 
     static uint32_t lastLedUpdateMs = 0;
-    const uint32_t now = millis();
 
     showVolumeBar(normalizedLevel);
 
-    //delayMicroseconds(LED_FRAME_GAP_SPACE);  // Without this, the LED updates can cause interference in the ADC readings, leading to inaccurate sound level measurements.
     delay(1);
 }

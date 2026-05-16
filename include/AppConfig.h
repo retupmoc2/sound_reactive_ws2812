@@ -62,5 +62,3 @@ static constexpr float VOLUME_SMOOTHING = 0.30f;
 // Serial debug output interval.
 static constexpr uint16_t DEBUG_PRINT_MS = 250;
 
-//static constexpr uint16_t LED_FRAME_GAP_SPACE = 250;    // value in microseconds to space out LED frame updates.
-
